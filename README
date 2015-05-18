@@ -1,0 +1,9 @@
+Beziers constructed from beziers
+
+Beziers are constructed from taking evenly spaced points from two different lines
+and successively drawing line segments between those points. This project is to see
+what happens when instead of using two straight "guide" lines we use one or two
+bezeier curves.
+
+Eventually I'd like to see what happens when you use 1, 2 or 3 bezier curves to
+construct a line.
