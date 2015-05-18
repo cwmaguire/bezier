@@ -1,43 +1,48 @@
 function demo(){
-  l1 = {p1: {x: 10, y: 10}, p2: {x: 15, y: 100}};
-  l2 = {p1: {x: 100, y: 20}, p2: {x: 80, y: 90}};
-  bezier(l1, l2);
+  var l1 = {p1: {x: 10, y: 10}, p2: {x: 15, y: 100}};
+  var l2 = {p1: {x: 100, y: 20}, p2: {x: 80, y: 90}};
+  var canvas = document.getElementById("bezier_canvas");
+  var ctx = canvas.getContext("2d");
+  drawLine(ctx, l1);
+  drawLine(ctx, l2);
+  //bezier(l1, l2);
+  setTimeout(bezier, 1000, l1, l2);
 };
 
 
 function bezier(line1, line2){
-  var segments = 100;
+  //var segments = 100;
+  var segments = 5;
   line1Segs = lineSegments(line1, segments);
   line2Segs = lineSegments(line2, segments);
   bezLines = bezierLines(line1Segs, line2Segs);
   bezSegs = bezSegments(bezLines, segments);
-  //steps = zip3(line1Segs, line2Segs, bezSegs);
-  //foldl(animateLine, bezSegs, []);
-  animateLine(bezSegs);
+  animateLines(bezSegs);
 }
 
-function animateLine(lineSegs){
+function animateLines(lineSegs){
   var canvas = document.getElementById("bezier_canvas");
 
   if (canvas.getContext) {
     ctx = canvas.getContext("2d");
     blankCanvas(ctx, canvas);
-    foldl(function(curr, prevs){
-            var lines = cons(prevs, curr);
-            map(function(line){
-                  drawLine(ctx, line)
-                },
-                lines);
-            return lines;
-          },
-          steps,
-          []);
+    setTimeout(animateLines_, 1000, ctx, lineSegs);
   }
 }
 
+function animateLines_(ctx, lines){
+  if(lines.length == 0){
+    window.alert("Done");
+    return;
+  }
+  drawLine(ctx, hd(lines));
+  setTimeout(animateLines_, 1000, ctx, tl(lines));
+}
+
 function drawLine(ctx, line){
-  ctx.moveTo(line.x1, line.y1);
-  ctx.lineTo(line.x2, line.y2);
+  ctx.fillStyle = "#101010"
+  ctx.moveTo(line.p1.x, line.p1.y);
+  ctx.lineTo(line.p2.y, line.p2.y);
   ctx.stroke();
 }
 
@@ -71,14 +76,6 @@ function lineSegments(l, numSegments){
                             l.p1.y + (seg * yDist));
             };
   return map(fun, segmentNumbers);
-}
-
-function plusOrMinus(a, b){
-  if(a < b){
-    return function(f, g){ return f + g };
-  }else{
-    return function(f, g){ return f - g };
-  }
 }
 
 function testLineSegments(){
@@ -124,14 +121,15 @@ function bezSegmentsTest(){
          seg2.p1.x == 25 &&
          seg2.p1.y == 15 &&
          seg2.p2.x == 30 &&
-         seg2.p2.y == 10;
+         seg2.p2.y == 10 &&
+         bezSegs.length == 2;
 }
 
 function lineSegmentN(lineCurrTotal){
   var line = lineCurrTotal[0];
   var segNo = lineCurrTotal[1];
   var segTotal = lineCurrTotal[2];
-  return lineSegments(line, segTotal)[segNo];
+  return lineSegments(line, segTotal)[segNo - 1];
 }
 
 function start(line){
@@ -140,4 +138,23 @@ function start(line){
 
 function end(line){
   return line.p2;
+}
+
+
+function drawRect(ctx, obj){
+    var fillStyle;
+    if(obj.fill == "gradient"){
+      obj.x += 5;
+      obj.y += 5;
+      var gradientX = obj.x + (obj.w / 2);
+      var gradientY = obj.y + (obj.w / 2);
+      gradient = ctx.createRadialGradient(gradientX, gradientY, obj.w, gradientX, gradientY, 0);
+      gradient.addColorStop(0,"rgba(" + obj.gr + "," + obj.gg + "," + obj.gb + ", " + obj.ga + ")");
+      gradient.addColorStop(1,"rgba(" + obj.r + "," + obj.g + "," + obj.b + ", " + obj.a + ")");
+      fillStyle = gradient;
+    }else{
+      fillStyle = "rgba(" + obj.r + "," + obj.g + "," + obj.b + ", " + obj.a + ")";
+    }
+    ctx.fillStyle = fillStyle;
+    ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
 }
