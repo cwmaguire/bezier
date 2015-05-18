@@ -153,8 +153,7 @@ function foldl(fun, arr, acc){
   if(arr.length == 0){
     return acc;
   }
-  acc_copy = acc.slice(0);
-  return foldl(fun, tl(arr), cons(acc, fun(hd(arr), acc_copy)));
+  return foldl(fun, tl(arr), fun(hd(arr), acc));
 }
 
 function zip(arr1, arr2){
