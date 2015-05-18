@@ -90,7 +90,7 @@ function seq(maybe_next, maybe_end, maybe_sequence){
   if(maybe_sequence == undefined){
     sequence = []
   }else{
-    sequence = maybe_sequence;
+    sequence = maybe_sequence.slice(0);
   }
   if(next > end){
     return sequence;
