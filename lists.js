@@ -100,6 +100,19 @@ function seq(maybe_next, maybe_end, maybe_sequence){
   }
 }
 
+function seqTest(){
+  var seq1 = seq(3);
+  var seq2 = seq(4,6);
+  return seq1[0] == 1 &&
+         seq1[1] == 2 &&
+         seq1[2] == 3 &&
+         seq1.length == 3 &&
+         seq2[0] == 4 &&
+         seq2[1] == 5 &&
+         seq2[2] == 6 &&
+         seq2.length == 3;
+}
+
 function repeat(elem, count){
   var sequence = seq(count);
   return map(function(x){ return elem }, sequence);
