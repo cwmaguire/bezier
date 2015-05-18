@@ -126,6 +126,29 @@ function repeatTest(){
          arr[3] == 'x';
 }
 
+function filter(fun, arr){
+  return filter_(fun, arr, []);
+}
+
+function filter_(fun, arr, results){
+  if(arr.length == 0){
+    return reverse(results);
+  }
+
+  if(fun(hd(arr))){
+    return filter_(fun, tl(arr), cons(results, hd(arr)));
+  } else {
+    return filter_(fun, tl(arr), results.slice(0));
+  }
+}
+
+function filterTest(){
+  var even = function(x){return x % 2 == 0};
+  var results = filter(even, [1,2,3,4]);
+  return results[0] == 2 &&
+         results[1] == 4;
+}
+
 function foldl(fun, arr, acc){
   if(arr.length == 0){
     return acc;
