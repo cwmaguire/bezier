@@ -54,19 +54,9 @@ function line(x1, y1, x2, y2){
 }
 
 function lineSegments(l, numSegments){
-  //var xDist = Math.abs(l.p1.x - l.p2.x) / numSegments;
-  //var yDist = Math.abs(l.p1.y - l.p2.y) / numSegments;
-  //var xFun = plusOrMinus(p1.x, p2.x);
-  //var yFun = plusOrMinus(p1.y, p2.y);
-  var xDist = (l.p1.x - l.p2.x) / numSegments;
-  var yDist = (l.p1.y - l.p2.y) / numSegments;
+  var xDist = (l.p2.x - l.p1.x) / numSegments;
+  var yDist = (l.p2.y - l.p1.y) / numSegments;
   var segmentNumbers = seq(numSegments);
-  //var fun = function(seg){
-                //return line(xFun(l.p1.x, ((seg - 1) * xDist)),
-                            //yFun(l.p1.y, ((seg - 1) * yDist)),
-                            //xFun(l.p1.x, (seg * xDist)),
-                            //yFun(l.p1.y, (seg * yDist)));
-            //};
   /*
    * x1 - x2 will be positive or negative depending on what direction
    * the line is going. If it's negative then dividing by the number
