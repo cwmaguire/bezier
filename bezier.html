@@ -1,0 +1,22 @@
+<html>
+<head>
+<script src="bezier.js"></script>
+<script src="lists.js"></script>
+</head>
+<body onload="">
+  <button onclick="start();">Start</button>
+  <button onclick="stop();">Stop</button>
+  <br>
+  <canvas
+    id="bezier_canvas"
+    height=100
+    width=400
+    style="border: 1px solid black;">
+  </canvas>
+  <form onsubmit="update(); return false;" action="">
+    <br>Boid size: <input id=boid_size type=text value=10>
+    <br><input type=submit value="update">
+  </form>
+  <div id=results></div>
+</body>
+</html>
