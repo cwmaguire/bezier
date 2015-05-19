@@ -12,13 +12,20 @@ function demo(){
 
 function bezier(line1, line2){
   //var segments = 100;
-  var segments = 5;
-  line1Segs = lineSegments(line1, segments);
-  line2Segs = lineSegments(line2, segments);
-  bezLines = bezierLines(line1Segs, line2Segs);
-  bezSegs = bezSegments(bezLines, segments);
+  var segments = 50;
+  var line1Segs = lineSegments(line1, segments);
+  var line2Segs = lineSegments(line2, segments);
+  var bezLines = bezierLines(line1Segs, line2Segs);
+  //map(logBezLine, bezLines);
+  var bezSegs = bezSegments(bezLines);
   animateLines(bezSegs);
 }
+
+//function logBezLine(bezLine){
+
+  //var div = document.getElementById("results");
+  //div.innerHTML = div.innerHTML + "<br>" + text;
+//}
 
 function animateLines(lineSegs){
   var canvas = document.getElementById("bezier_canvas");
@@ -36,13 +43,13 @@ function animateLines_(ctx, lines){
     return;
   }
   drawLine(ctx, hd(lines));
-  setTimeout(animateLines_, 1000, ctx, tl(lines));
+  setTimeout(animateLines_, 100, ctx, tl(lines));
 }
 
 function drawLine(ctx, line){
   ctx.fillStyle = "#101010"
   ctx.moveTo(line.p1.x, line.p1.y);
-  ctx.lineTo(line.p2.y, line.p2.y);
+  ctx.lineTo(line.p2.x, line.p2.y);
   ctx.stroke();
 }
 
@@ -50,45 +57,11 @@ function blankCanvas(ctx, canvas){
     drawRect(ctx,
              {x: 0, y: 0,
               h: canvas.height, w: canvas.width,
-              r: 255, g: 255, b: 255, a: 1.0,
-              fill: "color"});
+              r: 255, g: 255, b: 255, a: 1.0});
 }
 
 function line(x1, y1, x2, y2){
   return {p1: {x: x1, y: y1}, p2: {x: x2, y: y2}};
-}
-
-function lineSegments(l, numSegments){
-  var xDist = (l.p2.x - l.p1.x) / numSegments;
-  var yDist = (l.p2.y - l.p1.y) / numSegments;
-  var segmentNumbers = seq(numSegments);
-  /*
-   * x1 - x2 will be positive or negative depending on what direction
-   * the line is going. If it's negative then dividing by the number
-   * of segments will give a negative segment length.
-   * Multiplying a negative segment length by the segment number
-   * will give us the amounts to go in the proper (up or left) direction.
-   */
-  var fun = function(seg){
-                return line(l.p1.x + ((seg - 1) * xDist),
-                            l.p1.y + ((seg - 1) * yDist),
-                            l.p1.x + (seg * xDist),
-                            l.p1.y + (seg * yDist));
-            };
-  return map(fun, segmentNumbers);
-}
-
-function testLineSegments(){
-  var l = line(10, 10, 20, 20);
-  var segs = lineSegments(l, 2);
-  return segs[0].p1.x == 10 &&
-         segs[0].p1.y == 10 &&
-         segs[0].p2.x == 15 &&
-         segs[0].p2.y == 15 &&
-         segs[1].p1.x == 15 &&
-         segs[1].p1.y == 15 &&
-         segs[1].p2.x == 20 &&
-         segs[1].p2.y == 20;
 }
 
 function bezierLines(segs1, segs2){
@@ -102,9 +75,10 @@ function bezierLines(segs1, segs2){
   return lines;
 }
 
-function bezSegments(lines, numSegments){
-  var segSeq = seq(numSegments);
-  var lineCurrTotals = zip3(lines, segSeq, repeat(numSegments));
+function bezSegments(lines){
+  var segs = lines.length
+  var segSeq = seq(segs);
+  var lineCurrTotals = zip3(lines, segSeq, repeat(segs, segs));
   return map(lineSegmentN, lineCurrTotals);
 }
 
@@ -132,6 +106,40 @@ function lineSegmentN(lineCurrTotal){
   return lineSegments(line, segTotal)[segNo - 1];
 }
 
+function lineSegments(l, numSegments){
+  var xDist = (l.p2.x - l.p1.x) / numSegments;
+  var yDist = (l.p2.y - l.p1.y) / numSegments;
+  var segmentNumbers = seq(numSegments);
+  /*
+   * x1 - x2 will be positive or negative depending on what direction
+   * the line is going. If it's negative then dividing by the number
+   * of segments will give a negative segment length.
+   * Multiplying a negative segment length by the segment number
+   * will give us the amounts to go in the proper (up or left) direction.
+   */
+  var fun = function(seg){
+                return line(l.p1.x + ((seg - 1) * xDist),
+                            l.p1.y + ((seg - 1) * yDist),
+                            l.p1.x + (seg * xDist),
+                            l.p1.y + (seg * yDist));
+            };
+  return map(fun, segmentNumbers);
+}
+
+function lineSegmentsTest(){
+  var l = line(10, 10, 20, 20);
+  var segs = lineSegments(l, 2);
+  return segs[0].p1.x == 10 &&
+         segs[0].p1.y == 10 &&
+         segs[0].p2.x == 15 &&
+         segs[0].p2.y == 15 &&
+         segs[1].p1.x == 15 &&
+         segs[1].p1.y == 15 &&
+         segs[1].p2.x == 20 &&
+         segs[1].p2.y == 20 &&
+         segs.length == 2;
+}
+
 function start(line){
   return line.p1;
 }
@@ -143,18 +151,7 @@ function end(line){
 
 function drawRect(ctx, obj){
     var fillStyle;
-    if(obj.fill == "gradient"){
-      obj.x += 5;
-      obj.y += 5;
-      var gradientX = obj.x + (obj.w / 2);
-      var gradientY = obj.y + (obj.w / 2);
-      gradient = ctx.createRadialGradient(gradientX, gradientY, obj.w, gradientX, gradientY, 0);
-      gradient.addColorStop(0,"rgba(" + obj.gr + "," + obj.gg + "," + obj.gb + ", " + obj.ga + ")");
-      gradient.addColorStop(1,"rgba(" + obj.r + "," + obj.g + "," + obj.b + ", " + obj.a + ")");
-      fillStyle = gradient;
-    }else{
-      fillStyle = "rgba(" + obj.r + "," + obj.g + "," + obj.b + ", " + obj.a + ")";
-    }
+    fillStyle = "rgba(" + obj.r + "," + obj.g + "," + obj.b + ", " + obj.a + ")";
     ctx.fillStyle = fillStyle;
     ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
 }
