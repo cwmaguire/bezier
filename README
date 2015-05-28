@@ -11,3 +11,5 @@ construct a line.
 The demo() function draws beziers using procedurally generated bezier lines.
 
 The demo2() function draws beziers using functionally generated bezier lines.
+
+The demo3() function draws beziers using an even more functional approach.
