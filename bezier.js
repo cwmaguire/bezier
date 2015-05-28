@@ -14,6 +14,7 @@ function demo2(){
   var l2 = {p1: {x: 200, y: 40}, p2: {x: 220, y: 150}};
   var canvas = document.getElementById("bezier_canvas");
   var ctx = canvas.getContext("2d");
+  blankCanvas(ctx, canvas);
   drawLine(ctx, l1);
   drawLine(ctx, l2);
   var fractions = seqBy(0, 1, .01);
@@ -24,6 +25,19 @@ function demo2(){
   var bezLinePoints = zip(crossLines, fractions);
   var bezPoints = map(function(lp){ return linePoint(lp[0], lp[1]) }, bezLinePoints);
   drawPoints(ctx, bezPoints);
+}
+
+function demo3(){
+  var l1 = {p1: {x: 50, y: 200}, p2: {x: 10, y: 10}};
+  var l2 = {p1: {x: 200, y: 40}, p2: {x: 220, y: 150}};
+  var fractions = seqBy(0, 1, 0.01);
+  var canvas = document.getElementById("bezier_canvas");
+  var ctx = canvas.getContext("2d");
+  blankCanvas(ctx, canvas);
+  drawLine(ctx, l1);
+  drawLine(ctx, l2);
+  var points = map(function(frac){ return bezierPoint([l1,l2],frac) }, fractions);
+  drawPoints(ctx, points);
 }
 
 function drawPoints(ctx, points){
@@ -69,6 +83,7 @@ function animateLines_(ctx, lines){
 
 function drawLine(ctx, line){
   ctx.fillStyle = "#101010"
+  ctx.beginPath();
   ctx.moveTo(line.p1.x, line.p1.y);
   ctx.lineTo(line.p2.x, line.p2.y);
   ctx.stroke();
