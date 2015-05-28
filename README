@@ -7,3 +7,7 @@ bezeier curves.
 
 Eventually I'd like to see what happens when you use 1, 2 or 3 bezier curves to
 construct a line.
+
+The demo() function draws beziers using procedurally generated bezier lines.
+
+The demo2() function draws beziers using functionally generated bezier lines.
