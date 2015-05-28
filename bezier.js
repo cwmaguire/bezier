@@ -1,31 +1,52 @@
 function demo(){
-  var l1 = {p1: {x: 10, y: 10}, p2: {x: 15, y: 100}};
-  var l2 = {p1: {x: 100, y: 20}, p2: {x: 80, y: 90}};
+  var l1 = {p1: {x: 10, y: 10}, p2: {x: 15, y: 200}};
+  var l2 = {p1: {x: 200, y: 40}, p2: {x: 220, y: 150}};
   var canvas = document.getElementById("bezier_canvas");
   var ctx = canvas.getContext("2d");
   drawLine(ctx, l1);
   drawLine(ctx, l2);
-  //bezier(l1, l2);
-  setTimeout(bezier, 1000, l1, l2);
+  //setTimeout(bezier, 1000, l1, l2);
+  bezier(l1, l2);
 };
+
+function demo2(){
+  var l1 = {p1: {x: 15, y: 200}, p2: {x: 10, y: 10}};
+  var l2 = {p1: {x: 200, y: 40}, p2: {x: 220, y: 150}};
+  var canvas = document.getElementById("bezier_canvas");
+  var ctx = canvas.getContext("2d");
+  drawLine(ctx, l1);
+  drawLine(ctx, l2);
+  var fractions = seqBy(0, 1, .01);
+  var l1Points = map(function(f){ return linePoint(l1, f) }, fractions);
+  var l2Points = map(function(f){ return linePoint(l2, f) }, fractions);
+  var points = zip(l1Points, l2Points);
+  var crossLines = map(function(ps){ return lineFromPoints(ps[0], ps[1]) }, points);
+  var bezLinePoints = zip(crossLines, fractions);
+  var bezPoints = map(function(lp){ return linePoint(lp[0], lp[1]) }, bezLinePoints);
+  drawPoints(ctx, bezPoints);
+}
+
+function drawPoints(ctx, points){
+  var f = function(p, acc){
+            var prev = acc[0];
+            var lines_ = acc[1];
+            var line = lineFromPoints(p, prev);
+            return [p, cons(lines_, line)];
+          };
+  var lines0 = foldl(f, tl(points), [hd(points), []]);
+  var lines = lines0[1];
+  map(function(line){ drawLine(ctx, line) }, lines);
+}
 
 
 function bezier(line1, line2){
-  //var segments = 100;
-  var segments = 50;
+  var segments = 500;
   var line1Segs = lineSegments(line1, segments);
   var line2Segs = lineSegments(line2, segments);
   var bezLines = bezierLines(line1Segs, line2Segs);
-  //map(logBezLine, bezLines);
   var bezSegs = bezSegments(bezLines);
   animateLines(bezSegs);
 }
-
-//function logBezLine(bezLine){
-
-  //var div = document.getElementById("results");
-  //div.innerHTML = div.innerHTML + "<br>" + text;
-//}
 
 function animateLines(lineSegs){
   var canvas = document.getElementById("bezier_canvas");
@@ -33,17 +54,17 @@ function animateLines(lineSegs){
   if (canvas.getContext) {
     ctx = canvas.getContext("2d");
     blankCanvas(ctx, canvas);
-    setTimeout(animateLines_, 1000, ctx, lineSegs);
+    //setTimeout(animateLines_, 1000, ctx, lineSegs);
+    setTimeout(animateLines_, 0, ctx, lineSegs);
   }
 }
 
 function animateLines_(ctx, lines){
   if(lines.length == 0){
-    window.alert("Done");
     return;
   }
   drawLine(ctx, hd(lines));
-  setTimeout(animateLines_, 100, ctx, tl(lines));
+  setTimeout(animateLines_, 0, ctx, tl(lines));
 }
 
 function drawLine(ctx, line){
@@ -62,6 +83,21 @@ function blankCanvas(ctx, canvas){
 
 function line(x1, y1, x2, y2){
   return {p1: {x: x1, y: y1}, p2: {x: x2, y: y2}};
+}
+
+function lineFromPoints(p1, p2){
+  return {p1: p1, p2: p2};
+}
+
+function bezierPoint(lines, fraction){
+  var points = map(function(line){ return linePoint(line, fraction) }, lines);
+  return linePoint({p1: points[0], p2: points[1]}, fraction);
+}
+
+function linePoint(l, fraction){
+  var x = l.p1.x + ((l.p2.x - l.p1.x) * fraction);
+  var y = l.p1.y + ((l.p2.y - l.p1.y) * fraction);
+  return {x: Math.round(x), y: Math.round(y)};
 }
 
 function bezierLines(segs1, segs2){
@@ -150,8 +186,10 @@ function end(line){
 
 
 function drawRect(ctx, obj){
-    var fillStyle;
-    fillStyle = "rgba(" + obj.r + "," + obj.g + "," + obj.b + ", " + obj.a + ")";
+    var fillStyle = "rgba(" + obj.r + "," +
+                              obj.g + "," +
+                              obj.b + ", " +
+                              obj.a + ")";
     ctx.fillStyle = fillStyle;
     ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
 }

@@ -88,7 +88,7 @@ function seq(maybe_next, maybe_end, maybe_sequence){
     end = maybe_end;
   }
   if(maybe_sequence == undefined){
-    sequence = []
+    sequence = [];
   }else{
     sequence = maybe_sequence.slice(0);
   }
@@ -111,6 +111,29 @@ function seqTest(){
          seq2[1] == 5 &&
          seq2[2] == 6 &&
          seq2.length == 3;
+}
+
+function seqBy(start, end, step, maybe_sequence){
+  var sequence;
+  if(maybe_sequence == undefined){
+    sequence = [];
+  }else{
+    sequence = maybe_sequence;
+  }
+  if(start > end){
+    return reverse(sequence);
+  }
+  var next = parseFloat((start + step).toFixed(6));
+  return seqBy(next, end, step, cons(sequence, start));
+}
+
+function seqByTest(){
+  var seq = seqBy(3, 3.3, 0.1);
+  return seq[0] == 3 &&
+         seq[1] == 3.1 &&
+         seq[2] == 3.2 &&
+         seq[3] == 3.3 &&
+         seq.length == 4;
 }
 
 function repeat(elem, count){
