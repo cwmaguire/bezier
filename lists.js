@@ -232,3 +232,62 @@ function zip3Test(){
          zipped[1].length == 3 &&
          zipped[2].length == 3;
 }
+
+function pairs(arr){
+  return pairs_(arr);
+}
+
+function pairs_(arr, maybe_pairs){
+  var pairs;
+  if(maybe_pairs == undefined){
+    pairs = [];
+  }else{
+    pairs = maybe_pairs;
+  }
+
+  if(arr.length < 2){
+    return pairs;
+  }
+
+  return pairs_(tl(arr), cons(pairs, [hd(arr), hd(tl(arr))]));
+}
+
+function pairsTest(){
+  var arr = [1,2,3,4,5];
+  pairs1 = reverse(pairs([1,2,3,4,5]));
+  pairs2 = pairs([1,2]);
+  return pairs1[0][0] == 1 &&
+         pairs1[0][1] == 2 &&
+         pairs1[1][0] == 2 &&
+         pairs1[1][1] == 3 &&
+         pairs1[2][0] == 3 &&
+         pairs1[2][1] == 4 &&
+         pairs1[3][0] == 4 &&
+         pairs1[3][1] == 5 &&
+         pairs1.length == 4 &&
+         pairs2[0][0] == 1 &&
+         pairs2[0][1] == 2 &&
+         pairs2.length == 1 &&
+         pairs([]).length == 0 &&
+         pairs([1]).length == 0;
+}
+
+function rotate(arr){
+  if(arr.length == 0){
+    return [];
+  }else if(arr.length == 1){
+    return arr.slice(0);
+  }
+  return reverse(cons(reverse(tl(arr)), hd(arr)));
+}
+
+function rotateTest(){
+  var result = rotate([1,2,3]);
+  return result[0] == 2 &&
+         result[1] == 3 &&
+         result[2] == 1 &&
+         result.length == 3 &&
+         rotate([]).length == 0 &&
+         rotate([1])[0] == 1 &&
+         rotate([1]).length == 1;
+}

@@ -40,6 +40,22 @@ function demo3(){
   drawPoints(ctx, points);
 }
 
+function demo4(){
+  var l1 = {p1: {x: 50, y: 200}, p2: {x: 10, y: 10}};
+  var l2 = {p1: {x: 200, y: 40}, p2: {x: 220, y: 150}};
+  var l3 = {p1: {x: 220, y: 150}, p2: {x: 120, y: 50}};
+  var fractions = seqBy(0, 1, 0.01);
+  var canvas = document.getElementById("bezier_canvas");
+  var ctx = canvas.getContext("2d");
+  blankCanvas(ctx, canvas);
+  drawLine(ctx, l1, "#FF0000");
+  drawLine(ctx, l2, "#00FF00");
+  drawLine(ctx, l3, "#0000FF");
+  var points = map(function(frac){ return bezierPoint([l1,l2,l3],frac) }, fractions);
+  var lines = map(lineFromPair, pairs(points));
+  animateLines(lines);
+}
+
 function drawPoints(ctx, points){
   var f = function(p, acc){
             var prev = acc[0];
@@ -81,8 +97,13 @@ function animateLines_(ctx, lines){
   setTimeout(animateLines_, 0, ctx, tl(lines));
 }
 
-function drawLine(ctx, line){
-  ctx.fillStyle = "#101010"
+function drawLine(ctx, line, maybe_strokeStyle){
+  var strokeStyle = "#101010";
+  if(maybe_strokeStyle != undefined){
+    strokeStyle = maybe_strokeStyle;
+  }
+
+  ctx.strokeStyle = strokeStyle;
   ctx.beginPath();
   ctx.moveTo(line.p1.x, line.p1.y);
   ctx.lineTo(line.p2.x, line.p2.y);
@@ -104,9 +125,25 @@ function lineFromPoints(p1, p2){
   return {p1: p1, p2: p2};
 }
 
+function lineFromPair(pair){
+  return lineFromPoints(pair[0], pair[1]);
+}
+
+/*
+ * recursively reduce line pairs to lines and the final line to a point
+ * using a fraction.
+ * e.g. given lines a, b, c find fractional midpoints fa, fb, fc
+ * then recurse with fa-fb, fb-fc, find the fractional midpoints fab, fbc
+ * then recurse with line fab-fbc to get the final point fabbc
+ */
 function bezierPoint(lines, fraction){
-  var points = map(function(line){ return linePoint(line, fraction) }, lines);
-  return linePoint({p1: points[0], p2: points[1]}, fraction);
+  if(lines.length == 1){
+    return linePoint(lines[0], fraction);
+  }
+  var points = map(function(l){ return linePoint(l, fraction) }, lines);
+  var pointPairs = tl(reverse(zip(points, rotate(points))));
+  var bezLines = map(lineFromPair, pointPairs);
+  return bezierPoint(bezLines, fraction);
 }
 
 function linePoint(l, fraction){
