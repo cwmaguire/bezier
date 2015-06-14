@@ -57,9 +57,9 @@ function demo4(){
 }
 
 function demo5(){
-  var l1 = {p1: {x: 50, y: 200}, p2: {x: 10, y: 10}};
-  var l2 = {p1: {x: 200, y: 40}, p2: {x: 220, y: 150}};
-  var l3 = {p1: {x: 220, y: 150}, p2: {x: 120, y: 50}};
+  var l1 = {p1: {x: 10, y: 10}, p2: {x: 40, y: 400}};
+  var l2 = {p1: {x: 220, y: 250}, p2: {x: 160, y: 80}};
+  var l3 = {p1: {x: 400, y: 40}, p2: {x: 320, y: 250}};
   var fractions = seqBy(0, 1, 0.01);
   var canvas = document.getElementById("bezier_canvas");
   var ctx = canvas.getContext("2d");
@@ -112,7 +112,7 @@ function animateLines_(ctx, lines){
   setTimeout(animateLines_, 0, ctx, tl(lines));
 }
 
-function animateBreakdowns(ctx, breakdowns){
+function animateBreakdowns(breakdowns){
   var colourDefs = [{line: "#FF0000",
                      point: "#0000FF"},
                     {line: "#00FF00",
@@ -129,20 +129,39 @@ function animateBreakdowns(ctx, breakdowns){
   if (canvas.getContext) {
     ctx = canvas.getContext("2d");
     blankCanvas(ctx, canvas);
-    setTimeout(animateBreakdowns_, 100, ctx, breakdowns, colourDefs);
+    setTimeout(animateBreakdowns_, 100, canvas, ctx, [], breakdowns, colourDefs);
   }
 }
 
-function animateBreakdowns_(ctx, breakdowns, colourDefs){
-  animateBreakdown(ctx, hd(breakdowns), colourdefs)
-  setTimeout(animateBreakdowns_, 100, ctx, tl(breakdowns), colourDefs);
+function animateBreakdowns_(canvas, ctx, points, breakdowns, colourDefs){
+  if(breakdowns.length == 0){
+    return;
+  }
+  blankCanvas(ctx, canvas);
+  map(function(p){drawPoint(ctx, p)}, points);
+  var breakdown = hd(breakdowns);
+  animateBreakdown(ctx, breakdown, colourDefs)
+  breakdown_points = breakdownPoints(breakdown);
+  setTimeout(animateBreakdowns_,
+             100,
+             canvas,
+             ctx,
+             concat(breakdown_points, points),
+             tl(breakdowns),
+             colourDefs);
+}
+
+function breakdownPoints(breakdown){
+  var get_points = function(bd){return bd.points};
+  var breakdown_points = map(get_points, breakdown);
+  return foldl(concat, breakdown_points, []);
 }
 
 function animateBreakdown(ctx, breakdowns, colourDefs){
   map(function(bd){animateBreakdown_(ctx, bd, colourDefs)}, breakdowns);
 }
 
-function animateBreakdown_(ctx, breakdown, colorDef){
+function animateBreakdown_(ctx, breakdown, colourDef){
   map(function(l){ drawLine(ctx, l) }, breakdown.guides);
   map(function(l){ drawLine(ctx, l, colourDef.line) }, breakdown.lines);
   map(function(p){ drawPoint(ctx, p, colourDef.point) }, breakdown.points);
@@ -169,7 +188,7 @@ function drawPoint(ctx, point, maybe_fillStyle){
 
   ctx.fillStyle = fillStyle;
   ctx.beginPath();
-  ctx.arc(point.x,point.y,20,0,2*Math.PI);
+  ctx.arc(point.x,point.y,1,0,2*Math.PI);
   ctx.fill();
 }
 

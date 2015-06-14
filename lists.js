@@ -320,3 +320,21 @@ function apply2Test(){
   var f = function(x, y){ return x == y };
   return (apply2(f))([1, 1]);
 }
+
+function concat(arr1, arr2){
+  return concat_(reverse(arr1), arr2);
+}
+
+function concat_(arr1, arr2){
+  if(arr1.length == 0){
+    return arr2;
+  }
+  return concat(tl(arr1), cons(arr2, hd(arr1)));
+}
+
+function concatTest(){
+  return equal([1,2,3,4], concat([1,2],[3,4])) &&
+         equal([1,2], concat([], [1,2])) &&
+         equal([1,2], concat([1,2], [])) &&
+         equal([], concat([], []));
+}
