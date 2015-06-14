@@ -139,6 +139,7 @@ function animateBreakdowns_(canvas, ctx, points, breakdowns, colourDefs){
   }
   blankCanvas(ctx, canvas);
   map(function(p){drawPoint(ctx, p)}, points);
+  //map(apply2(function(p1, p2){drawLine(ctx, {p1: p1, p2: p2})}), pairs(points));
   var breakdown = hd(breakdowns);
   animateBreakdown(ctx, breakdown, colourDefs)
   breakdown_points = breakdownPoints(breakdown);
@@ -165,7 +166,7 @@ function animateBreakdown(ctx, breakdowns, colourDefs){
 function animateBreakdown_(ctx, breakdown, colourDef){
   map(function(l){ drawLine(ctx, l) }, breakdown.guides);
   map(function(l){ drawLine(ctx, l, colourDef.line) }, breakdown.lines);
-  map(function(p){ drawPoint(ctx, p, colourDef.point) }, breakdown.points);
+  map(function(p){ drawPoint(ctx, p, colourDef.point, 5) }, breakdown.points);
 }
 
 function drawLine(ctx, line, maybe_strokeStyle){
@@ -181,15 +182,19 @@ function drawLine(ctx, line, maybe_strokeStyle){
   ctx.stroke();
 }
 
-function drawPoint(ctx, point, maybe_fillStyle){
+function drawPoint(ctx, point, maybe_fillStyle, maybe_size){
   var fillStyle = "#101010";
   if(maybe_fillStyle != undefined){
     fillStyle = maybe_fillStyle;
   }
+  var size = 1;
+  if(maybe_size != undefined){
+    size = maybe_size;
+  }
 
   ctx.fillStyle = fillStyle;
   ctx.beginPath();
-  ctx.arc(point.x,point.y,1,0,2*Math.PI);
+  ctx.arc(point.x,point.y,size,0,2*Math.PI);
   ctx.fill();
 }
 
