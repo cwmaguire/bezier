@@ -1,3 +1,7 @@
+function identity(x){
+  return x;
+}
+
 function hd(arr){
   return arr[0];
 }
@@ -255,7 +259,7 @@ function pairs_(arr, maybe_pairs){
   }
 
   if(arr.length < 2){
-    return pairs;
+    return reverse(pairs);
   }
 
   return pairs_(tl(arr), cons(pairs, [hd(arr), hd(tl(arr))]));
@@ -263,7 +267,7 @@ function pairs_(arr, maybe_pairs){
 
 function pairsTest(){
   var arr = [1,2,3,4,5];
-  pairs1 = reverse(pairs([1,2,3,4,5]));
+  pairs1 = pairs([1,2,3,4,5]);
   pairs2 = pairs([1,2]);
   return equal([[1,2],[2,3],[3,4],[4,5]], pairs1) &&
          equal([[1,2]], pairs2) &&

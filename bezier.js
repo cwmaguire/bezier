@@ -212,13 +212,14 @@ function bezierPoint(lines, fraction){
 function bezierBreakdowns(lines, sub_lines, fraction, maybe_breakdowns){
   var breakdowns = [];
   if(sub_lines.length == 0){
-    return maybe_breakdowns;
+    return reverse(maybe_breakdowns);
   }
   if(maybe_breakdowns != undefined){
     breakdowns = maybe_breakdowns;
   }
   var func = function(pair){ return bezierLine(pair[0], pair[1], fraction); };
-  var breakdown_lines = map(func, pairs(sub_lines));
+  var sub_line_pairs = pairs(sub_lines);
+  var breakdown_lines = map(func, sub_line_pairs);
   var breakdown_points = map(function(l){return linePoint(l, fraction)}, sub_lines);
   var breakdown = {guides: sub_lines,
                    lines: breakdown_lines,
@@ -227,29 +228,45 @@ function bezierBreakdowns(lines, sub_lines, fraction, maybe_breakdowns){
 }
 
 function bezierBreakdownsTest(){
-  var lines = [{p1: {x: 0, y: 0}, p2: {x: 0, y: 100}},
-               {p1: {x: 100, y: 0}, p2: {x: 100, y: 100}},
-               {p1: {x: 200, y: 0}, p2: {x: 200, y: 100}},
-               {p1: {x: 300, y: 0}, p2: {x: 300, y: 100}}];
-  var sub_lines_1 = [line(200, 50, 300, 50),
+  var lines_1 = [{p1: {x: 0, y: 0}, p2: {x: 0, y: 100}},
+                 {p1: {x: 100, y: 0}, p2: {x: 100, y: 100}},
+                 {p1: {x: 200, y: 0}, p2: {x: 200, y: 100}},
+                 {p1: {x: 300, y: 0}, p2: {x: 300, y: 100}}];
+  var sub_lines_1 = [line(0, 50, 100, 50),
                      line(100, 50, 200, 50),
-                     line(0, 50, 100, 50)];
+                     line(200, 50, 300, 50)];
+  var sub_lines_2 = [line(50, 50, 150, 50),
+                     line(150, 50, 250, 50)];
+  var sub_lines_3 = [line(100, 50, 200, 50)];
   var points_1 = [{x: 0, y: 50},
                   {x: 100, y: 50},
                   {x: 200, y: 50},
                   {x: 300, y: 50}];
-  var breakdowns = bezierBreakdowns(lines, lines, 0.5);
-  var isLinesEqualWrapper = function(lines){return isLinesEqual(lines[0], lines[1])};
-  var isPointsEqualWrapper = function(points){return isLinesEqual(lines[0], lines[1])};
-  var one = all(apply2(isLinesEqual), zip(lines, breakdowns[3].guides));
-  var two = all(apply2(isLinesEqual), zip(sub_lines_1, breakdowns[3].lines));
-  var three = all(apply2(isPointsEqual), zip(points_1, breakdowns[3].points));
-  //var results = [all(apply2(isLinesEqual), zip(lines, breakdowns[3].guides)),
-                 //all(apply2(isLinesEqual), zip(sub_lines_1, breakdowns[3].lines)),
-                 //all(apply2(isPointsEqual), zip(points_1, breakdowns[3].points))];
-  //var four = all(apply2(isLinesEqual), zip(sub_lines
-  var results = [one, two, three];
-  return all(function(bool){return bool}, results);
+  var points_2 = [{x: 50, y: 50},
+                  {x: 150, y: 50},
+                  {x: 250, y: 50}];
+  var points_3 = [{x: 100, y: 50},
+                  {x: 200, y: 50}];
+  var points_4 = [{x: 150, y: 50}];
+  var breakdowns = bezierBreakdowns(lines_1, lines_1, 0.5);
+  results = [all(apply2(isLinesEqual), zip(lines_1, breakdowns[0].guides)),
+             all(apply2(isLinesEqual), zip(sub_lines_1, breakdowns[0].lines)),
+             all(apply2(isPointsEqual), zip(points_1, breakdowns[0].points)),
+
+             all(apply2(isLinesEqual), zip(sub_lines_1, breakdowns[1].guides)),
+             all(apply2(isLinesEqual), zip(sub_lines_2, breakdowns[1].lines)),
+             all(apply2(isPointsEqual), zip(points_2, breakdowns[1].points)),
+
+             all(apply2(isLinesEqual), zip(sub_lines_2, breakdowns[2].guides)),
+             all(apply2(isLinesEqual), zip(sub_lines_3, breakdowns[2].lines)),
+             all(apply2(isPointsEqual), zip(points_3, breakdowns[2].points)),
+
+             all(apply2(isLinesEqual), zip(sub_lines_3, breakdowns[3].guides)),
+             breakdowns[3].lines.length == 0,
+             all(apply2(isPointsEqual), zip(points_4, breakdowns[3].points)),
+
+             breakdowns.length == 4];
+  return all(identity, results);
 }
 
 function isPointsEqual(p1, p2){
