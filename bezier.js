@@ -60,7 +60,7 @@ function demo5(){
   var l1 = {p1: {x: 10, y: 10}, p2: {x: 40, y: 400}};
   var l2 = {p1: {x: 220, y: 250}, p2: {x: 160, y: 80}};
   var l3 = {p1: {x: 400, y: 40}, p2: {x: 320, y: 250}};
-  var fractions = seqBy(0, 1, 0.01);
+  var fractions = seqBy(0, 1, 0.005);
   var canvas = document.getElementById("bezier_canvas");
   var ctx = canvas.getContext("2d");
   blankCanvas(ctx, canvas);
@@ -129,7 +129,7 @@ function animateBreakdowns(breakdowns){
   if (canvas.getContext) {
     ctx = canvas.getContext("2d");
     blankCanvas(ctx, canvas);
-    setTimeout(animateBreakdowns_, 100, canvas, ctx, [], breakdowns, colourDefs);
+    setTimeout(animateBreakdowns_, 10, canvas, ctx, [], breakdowns, colourDefs);
   }
 }
 
@@ -143,7 +143,7 @@ function animateBreakdowns_(canvas, ctx, points, breakdowns, colourDefs){
   animateBreakdown(ctx, breakdown, colourDefs)
   breakdown_points = breakdownPoints(breakdown);
   setTimeout(animateBreakdowns_,
-             100,
+             10,
              canvas,
              ctx,
              concat(breakdown_points, points),
@@ -158,7 +158,8 @@ function breakdownPoints(breakdown){
 }
 
 function animateBreakdown(ctx, breakdowns, colourDefs){
-  map(function(bd){animateBreakdown_(ctx, bd, colourDefs)}, breakdowns);
+  map(apply2(function(bd, cd){animateBreakdown_(ctx, bd, cd)}),
+      zip(breakdowns, colourDefs));
 }
 
 function animateBreakdown_(ctx, breakdown, colourDef){
