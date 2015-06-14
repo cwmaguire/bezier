@@ -2,6 +2,11 @@ function hd(arr){
   return arr[0];
 }
 
+function hdTest(){
+  var arr = [1,2,3];
+  return hd(arr) == 1;
+}
+
 function tl(arr){
   return arr.slice(1);
 }
@@ -16,6 +21,37 @@ function tlTest(){
          tail[0] == 2 &&
          tail[1] == 3 &&
          tail.length == 2;
+}
+
+function equal(arr1, arr2){
+  if(!Array.isArray(arr1) ||
+     !Array.isArray(arr2)){
+    return false;
+  }
+  if(arr1.length == 0 ||
+     arr2.length == 0){
+    return arr1.length == 0 &&
+           arr2.length == 0;
+  }
+  if(Array.isArray(arr1[0])){
+    return equal(arr1[0], arr2[0]) &&
+           equal(tl(arr1), tl(arr2));
+  }
+  return arr1[0] == arr2[0] &&
+         equal(tl(arr1), tl(arr2));
+}
+
+function equalTest(){
+  return equal([1,2,3], [1,2,3]) &&
+         equal([[1,2,3], [4,5,6]], [[1,2,3], [4,5,6]]) &&
+         equal([[1,2,3], 4], [[1,2,3], 4]) &&
+         !equal([[1,2,4], 4], [[1,2,3], 4]) &&
+         !equal([[1,2,3], 3], [[1,2,3], 4]) &&
+         !equal([1,2,3], [1,2,4]) &&
+         !equal([1,2], [1,2,3]) &&
+         !equal([1,2,3], [1,2]) &&
+         !equal([[1,2,3]], [1,2,3]) &&
+         equal([], []);
 }
 
 function cons(arr, elem){
@@ -47,12 +83,8 @@ function reverse(arr){
 function reverseTest(){
   var arr = [1,2,3];
   var rev = reverse(arr);
-  return arr[0] == 1 &&
-         arr[1] == 2 &&
-         arr[2] == 3 &&
-         rev[0] == 3 &&
-         rev[1] == 2 &&
-         rev[2] == 1;
+  return equal([1,2,3], arr) &&
+         equal([3,2,1], rev);
 }
 
 function concat(arr1, arr2){
@@ -71,9 +103,7 @@ function map(fun, arr, maybe_results){
 
 function mapTest(){
   var result = map(function(x){ return x + 1 }, seq(3));
-  return result[0] == 2 &&
-         result[1] == 3 &&
-         result[2] == 4;
+  return equal([2,3,4], result);
 }
 
 function seq(maybe_next, maybe_end, maybe_sequence){
@@ -103,14 +133,8 @@ function seq(maybe_next, maybe_end, maybe_sequence){
 function seqTest(){
   var seq1 = seq(3);
   var seq2 = seq(4,6);
-  return seq1[0] == 1 &&
-         seq1[1] == 2 &&
-         seq1[2] == 3 &&
-         seq1.length == 3 &&
-         seq2[0] == 4 &&
-         seq2[1] == 5 &&
-         seq2[2] == 6 &&
-         seq2.length == 3;
+  return equal([1,2,3], seq1) &&
+         equal([4,5,6], seq2);
 }
 
 function seqBy(start, end, step, maybe_sequence){
@@ -129,11 +153,7 @@ function seqBy(start, end, step, maybe_sequence){
 
 function seqByTest(){
   var seq = seqBy(3, 3.3, 0.1);
-  return seq[0] == 3 &&
-         seq[1] == 3.1 &&
-         seq[2] == 3.2 &&
-         seq[3] == 3.3 &&
-         seq.length == 4;
+  return equal([3, 3.1, 3.2, 3.3], seq);
 }
 
 function repeat(elem, count){
@@ -143,10 +163,7 @@ function repeat(elem, count){
 
 function repeatTest(){
   var arr = repeat('x', 4);
-  return arr[0] == 'x' &&
-         arr[1] == 'x' &&
-         arr[2] == 'x' &&
-         arr[3] == 'x';
+  return equal(['x', 'x', 'x', 'x'], arr);
 }
 
 function filter(fun, arr){
@@ -168,8 +185,7 @@ function filter_(fun, arr, results){
 function filterTest(){
   var even = function(x){return x % 2 == 0};
   var results = filter(even, [1,2,3,4]);
-  return results[0] == 2 &&
-         results[1] == 4;
+  return equal([2,4], results);
 }
 
 function foldl(fun, arr, acc){
@@ -195,6 +211,11 @@ function zip_(arr1, arr2, zips){
 
 }
 
+function zipTest(){
+  var zipped = zip([1,2,3], [4,5,6]);
+  return equal([[1,4],[2,5],[3,6]], zipped);
+}
+
 function zip3(arr1, arr2, arr3){
   return zip3_(arr1, arr2, arr3, []);
 }
@@ -218,19 +239,7 @@ function zip3Test(){
   var arr3 = [7,8,9];
 
   var zipped = zip3(arr1, arr2, arr3);
-  return zipped[0][0] == 1 &&
-         zipped[0][1] == 4 &&
-         zipped[0][2] == 7 &&
-         zipped[1][0] == 2 &&
-         zipped[1][1] == 5 &&
-         zipped[1][2] == 8 &&
-         zipped[2][0] == 3 &&
-         zipped[2][1] == 6 &&
-         zipped[2][2] == 9 &&
-         zipped.length == 3 &&
-         zipped[0].length == 3 &&
-         zipped[1].length == 3 &&
-         zipped[2].length == 3;
+  return equal([[1,4,7],[2,5,8],[3,6,9]], zipped);
 }
 
 function pairs(arr){
@@ -256,18 +265,8 @@ function pairsTest(){
   var arr = [1,2,3,4,5];
   pairs1 = reverse(pairs([1,2,3,4,5]));
   pairs2 = pairs([1,2]);
-  return pairs1[0][0] == 1 &&
-         pairs1[0][1] == 2 &&
-         pairs1[1][0] == 2 &&
-         pairs1[1][1] == 3 &&
-         pairs1[2][0] == 3 &&
-         pairs1[2][1] == 4 &&
-         pairs1[3][0] == 4 &&
-         pairs1[3][1] == 5 &&
-         pairs1.length == 4 &&
-         pairs2[0][0] == 1 &&
-         pairs2[0][1] == 2 &&
-         pairs2.length == 1 &&
+  return equal([[1,2],[2,3],[3,4],[4,5]], pairs1) &&
+         equal([[1,2]], pairs2) &&
          pairs([]).length == 0 &&
          pairs([1]).length == 0;
 }
@@ -283,11 +282,37 @@ function rotate(arr){
 
 function rotateTest(){
   var result = rotate([1,2,3]);
-  return result[0] == 2 &&
-         result[1] == 3 &&
-         result[2] == 1 &&
-         result.length == 3 &&
+  return equal([2,3,1], result) &&
          rotate([]).length == 0 &&
          rotate([1])[0] == 1 &&
          rotate([1]).length == 1;
+}
+
+function all(fun, arr){
+  if(arr.length == 0){
+    return true;
+  }
+  return fun(hd(arr)) && all(fun, tl(arr));
+}
+
+function allTest(){
+  var fun = function(x){ return x == 1 };
+  return all(fun, [1, 1, 1]) &&
+         !all(fun, [1, 1, 2]) &&
+         all(fun, []);
+}
+
+/*
+ * wrap a function that takes two arguments
+ * in a fuction that takes an array and calls
+ * that function with the first 2 elements of the
+ * array as the two arguments
+ */
+function apply2(f){
+  return function(p){return f(p[0], p[1])};
+}
+
+function apply2Test(){
+  var f = function(x, y){ return x == y };
+  return (apply2(f))([1, 1]);
 }

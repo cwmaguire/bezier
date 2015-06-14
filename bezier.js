@@ -220,10 +220,45 @@ function bezierBreakdowns(lines, sub_lines, fraction, maybe_breakdowns){
   var func = function(pair){ return bezierLine(pair[0], pair[1], fraction); };
   var breakdown_lines = map(func, pairs(sub_lines));
   var breakdown_points = map(function(l){return linePoint(l, fraction)}, sub_lines);
-  var breakdown = {guides: lines,
+  var breakdown = {guides: sub_lines,
                    lines: breakdown_lines,
                    points: breakdown_points};
   return bezierBreakdowns(lines, breakdown_lines, fraction, cons(breakdowns, breakdown));
+}
+
+function bezierBreakdownsTest(){
+  var lines = [{p1: {x: 0, y: 0}, p2: {x: 0, y: 100}},
+               {p1: {x: 100, y: 0}, p2: {x: 100, y: 100}},
+               {p1: {x: 200, y: 0}, p2: {x: 200, y: 100}},
+               {p1: {x: 300, y: 0}, p2: {x: 300, y: 100}}];
+  var sub_lines_1 = [line(200, 50, 300, 50),
+                     line(100, 50, 200, 50),
+                     line(0, 50, 100, 50)];
+  var points_1 = [{x: 0, y: 50},
+                  {x: 100, y: 50},
+                  {x: 200, y: 50},
+                  {x: 300, y: 50}];
+  var breakdowns = bezierBreakdowns(lines, lines, 0.5);
+  var isLinesEqualWrapper = function(lines){return isLinesEqual(lines[0], lines[1])};
+  var isPointsEqualWrapper = function(points){return isLinesEqual(lines[0], lines[1])};
+  var one = all(apply2(isLinesEqual), zip(lines, breakdowns[3].guides));
+  var two = all(apply2(isLinesEqual), zip(sub_lines_1, breakdowns[3].lines));
+  var three = all(apply2(isPointsEqual), zip(points_1, breakdowns[3].points));
+  //var results = [all(apply2(isLinesEqual), zip(lines, breakdowns[3].guides)),
+                 //all(apply2(isLinesEqual), zip(sub_lines_1, breakdowns[3].lines)),
+                 //all(apply2(isPointsEqual), zip(points_1, breakdowns[3].points))];
+  //var four = all(apply2(isLinesEqual), zip(sub_lines
+  var results = [one, two, three];
+  return all(function(bool){return bool}, results);
+}
+
+function isPointsEqual(p1, p2){
+  return p1.x == p2.x && p1.y == p2.y;
+
+}
+function isLinesEqual(l1, l2){
+  return isPointsEqual(l1.p1, l2.p1) &&
+         isPointsEqual(l1.p2, l2.p2);
 }
 
 function linePoint(l, fraction){
